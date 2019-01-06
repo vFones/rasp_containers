@@ -1,0 +1,30 @@
+#!/bin/bash
+# Lookups may not work for VPN / tun0
+IP_LOOKUP="$(ip route get 8.8.8.8 | awk '{for(i=1;i<=NF;i++) if ($i=="src") print $(i+1)}')"  
+
+# Just hard code these to your docker server's LAN IP if lookups aren't working
+IP="${IP:-$IP_LOOKUP}"  # use $IP, if set, otherwise IP_LOOKUP
+
+# Default of directory you run this from, update to where ever.
+DOCKER_CONFIGS="/etc"  
+
+echo "### Make sure your IPs are correct, hard code ServerIP ENV VARs if necessary\nIP: ${IP}\nIPv6: ${IPv6}"
+
+# Default ports + daemonized docker container
+docker run -d \
+    --name pihole \
+    -p 53:53/tcp -p 53:53/udp \
+    -p 67:67/udp \
+    -p 8080:80 \
+    -v "${DOCKER_CONFIGS}/pihole/:/etc/pihole/" \
+    -v "${DOCKER_CONFIGS}/dnsmasq.d/:/etc/dnsmasq.d/" \
+    -e ServerIP="${IP}" \
+    -e TZ=CET \
+    --restart=unless-stopped \
+    --cap-add=NET_ADMIN \
+    --dns=127.0.0.1 --dns=1.1.1.1 \
+    pihole/pihole:latest
+
+sleep 2
+echo -n "Your password for https://${IP}/admin/ is "
+docker logs pihole 2> /dev/null | grep 'password:'

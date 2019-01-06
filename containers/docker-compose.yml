@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  glances:
+    build: https://github.com/nicolargo/glances.git#develop:/docker-files/devel-arm/
+    restart: always
+    ports:
+      - 61208:61208
+    pid: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - GLANCES_OPT=-w

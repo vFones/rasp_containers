@@ -1,0 +1,3 @@
+docker run -d --restart=always -p 61208-61209:61208-61209 -e GLANCES_OPT=-w -v /var/run/docker.sock:/var/run/docker.sock:ro --pid host containers_glances:latest
+docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
+docker run -d -p 4443:4443 -p 443:443 -p 80:80 --restart unless-stopped -v /media/ncdata:/data --mount type=bind,source=/media/HDD/app/data,target=/data/app/data --name nextcloudpi ownyourbits/nextcloudpi-armhf 192.168.2.231
